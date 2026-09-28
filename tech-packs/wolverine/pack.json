@@ -1,0 +1,16 @@
+{
+  "name": "wolverine",
+  "description": "Wolverine — the messaging library, declared as a package reference in a .NET project.",
+  "requires": [
+    "dotnet"
+  ],
+  "triggers": [
+    {
+      "glob": "**/*.csproj",
+      "contains": "WolverineFx",
+      "fact": "Wolverine declared as a package reference"
+    }
+  ],
+  "facts": [],
+  "commands": []
+}

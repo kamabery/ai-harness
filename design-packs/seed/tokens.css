@@ -1,0 +1,205 @@
+/* ---------------------------------------------------------------------------------------------
+ * The design system seed — a real vocabulary, copied in before the first screen exists.
+ *
+ * This file exists to change which path is the cheap one. "Compose from the design system" is
+ * sound advice and it fails in practice, because at the moment the first screen is written there
+ * is no design system, so composing from it is the expensive path and raw markup is the cheap one.
+ * Every build takes the cheap one. So the system arrives first, already filled in, and reaching
+ * for a raw value becomes the deviation rather than the default.
+ *
+ * ADAPT THIS, DO NOT SHIP IT UNCHANGED. The scales, ratios and relationships are the considered
+ * part and should survive. The hues are a neutral starting point and are meant to be replaced with
+ * the product's own. A build that ships these exact values has skipped the design phase; the
+ * ui-quality guard's `default-theme` check is what notices.
+ * ------------------------------------------------------------------------------------------- */
+
+:root {
+  /* -- Type ------------------------------------------------------------------------------------
+   * One modular scale, ratio 1.250 (major third), six steps. Arbitrary sizes are what make a
+   * screen look assembled rather than designed, so there are six and no others.
+   * Line height runs inverse to size: body loose enough to read, headings tight enough to group.
+   * Tracking runs negative as size grows — large text set at default tracking reads loose. */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --text-xs:   0.75rem;   /* 12px - labels, captions, table meta */
+  --text-sm:   0.875rem;  /* 14px - secondary body, dense UI */
+  --text-base: 1rem;      /* 16px - body. Never smaller for reading text. */
+  --text-lg:   1.25rem;   /* 20px - lead paragraph, card title */
+  --text-xl:   1.5625rem; /* 25px - section heading */
+  --text-2xl:  1.953rem;  /* 31px - page heading */
+  --text-3xl:  2.441rem;  /* 39px - display */
+
+  --leading-tight:   1.15;  /* display and page headings */
+  --leading-snug:    1.3;   /* section headings, card titles */
+  --leading-normal:  1.5;   /* body */
+  --leading-relaxed: 1.65;  /* long-form reading */
+
+  --tracking-tight:  -0.02em; /* --text-2xl and up */
+  --tracking-normal: 0;
+  --tracking-wide:   0.04em;  /* all-caps labels, which need it */
+
+  --weight-normal:   400;
+  --weight-medium:   500;  /* the workhorse for UI labels and table headers */
+  --weight-semibold: 600;  /* headings, primary emphasis */
+  --weight-bold:     700;  /* reserve for display */
+
+  /* Measure. Unbounded line length is the most common amateur tell: text that runs the full width
+   * of a 1600px window is unreadable however good the type is. */
+  --measure: 66ch;
+  --measure-narrow: 45ch;
+
+  /* -- Space -----------------------------------------------------------------------------------
+   * One 4px-based scale. The rule that matters is not the values but PROXIMITY: the gap between
+   * two groups must be visibly larger than the gaps inside either one. Uniform spacing is what
+   * makes a screen read as unconsidered, and it is what a generator emits by default. */
+  --space-0:  0;
+  --space-1:  0.25rem;  /*  4px - inside a control */
+  --space-2:  0.5rem;   /*  8px - between tightly related items */
+  --space-3:  0.75rem;  /* 12px */
+  --space-4:  1rem;     /* 16px - the default gap inside a group */
+  --space-6:  1.5rem;   /* 24px - between groups */
+  --space-8:  2rem;     /* 32px - between sections */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px - page rhythm */
+  --space-24: 6rem;     /* 96px */
+
+  /* -- Colour ----------------------------------------------------------------------------------
+   * A neutral ramp does about ninety percent of the work in professional UI; the accent is used
+   * sparingly and means something when it appears. Note that neither end is pure: #000 on #fff is
+   * harsher than it looks and reads as unfinished. */
+  --neutral-0:   #ffffff;
+  --neutral-50:  #fafafa;
+  --neutral-100: #f4f4f5;
+  --neutral-200: #e4e4e7;
+  --neutral-300: #d4d4d8;
+  --neutral-400: #a1a1aa;
+  --neutral-500: #71717a;
+  --neutral-600: #52525b;
+  --neutral-700: #3f3f46;
+  --neutral-800: #27272a;
+  --neutral-900: #18181b;
+  --neutral-950: #09090b;
+
+  /* REPLACE THIS HUE. It is a starting point, not a brand. */
+  --accent-50:  #eef4ff;
+  --accent-100: #d9e6ff;
+  --accent-300: #8db4fe;
+  --accent-500: #3b76f6;
+  --accent-600: #2a5ce0;
+  --accent-700: #1f47b5;
+
+  --success-500: #16a34a;
+  --success-600: #15803d;
+  --warning-500: #d97706;
+  --warning-600: #b45309;
+  --danger-500:  #dc2626;
+  --danger-600:  #b91c1c;
+
+  /* Roles. Components reference these, never the ramp directly — that is what makes a theme
+   * swappable and what keeps a colour from meaning two different things on two screens. */
+  --bg:             var(--neutral-50);
+  --bg-raised:      var(--neutral-0);
+  --bg-sunken:      var(--neutral-100);
+  --bg-hover:       var(--neutral-100);
+  --bg-active:      var(--neutral-200);
+
+  --fg:             var(--neutral-900);  /* body text */
+  --fg-muted:       var(--neutral-600);  /* secondary - still AA on --bg */
+  --fg-subtle:      var(--neutral-500);  /* meta. AA on --bg; never for body text. */
+  --fg-on-accent:   var(--neutral-0);
+
+  --border:         var(--neutral-200);  /* 1px, low contrast. Heavy borders everywhere is a tell. */
+  --border-strong:  var(--neutral-300);
+
+  --accent:         var(--accent-600);
+  --accent-hover:   var(--accent-700);
+  --accent-subtle:  var(--accent-50);
+
+  --focus-ring:     var(--accent-500);   /* its own token, never "the brand colour that looked similar" */
+
+  /* -- Shape -----------------------------------------------------------------------------------
+   * Radius scales with the element. A 12px radius on a 24px chip looks like a mistake. */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  --border-width: 1px;
+
+  /* -- Elevation -------------------------------------------------------------------------------
+   * Four levels and no more. Subtle, layered shadows read as depth; a single hard shadow reads as
+   * a sticker. Level 0 is flat-on-surface and is the right answer more often than it gets used. */
+  --shadow-0: none;
+  --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.04), 0 1px 3px 0 rgb(0 0 0 / 0.06);
+  --shadow-2: 0 2px 4px -1px rgb(0 0 0 / 0.05), 0 4px 8px -2px rgb(0 0 0 / 0.08);
+  --shadow-3: 0 8px 16px -4px rgb(0 0 0 / 0.08), 0 16px 32px -8px rgb(0 0 0 / 0.10);
+
+  /* -- Motion ----------------------------------------------------------------------------------
+   * Fast enough not to be waited on, slow enough to be seen. Ease-out for things arriving. */
+  --duration-fast: 120ms;
+  --duration-base: 180ms;
+  --duration-slow: 260ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* -- Controls --------------------------------------------------------------------------------
+   * 44px is the accessible minimum for a touch target and it is not negotiable on a control a
+   * finger has to hit. --control-height-sm is for dense desktop tables only. */
+  --control-height:    2.75rem; /* 44px */
+  --control-height-sm: 2rem;    /* 32px - pointer-only, dense contexts */
+  --z-dropdown: 1000;
+  --z-sticky:   1100;
+  --z-overlay:  1200;
+  --z-modal:    1300;
+  --z-toast:    1400;
+}
+
+/* Dark theme by role swap only. Redefining roles rather than ramps is what keeps one component
+ * correct in both themes without a second stylesheet. */
+:root[data-theme="dark"] {
+  --bg:            var(--neutral-950);
+  --bg-raised:     var(--neutral-900);
+  --bg-sunken:     var(--neutral-950);
+  --bg-hover:      var(--neutral-800);
+  --bg-active:     var(--neutral-700);
+  --fg:            var(--neutral-100);
+  --fg-muted:      var(--neutral-400);
+  --fg-subtle:     var(--neutral-500);
+  --border:        var(--neutral-800);
+  --border-strong: var(--neutral-700);
+  --accent:        var(--accent-500);
+  --accent-hover:  var(--accent-300);
+  --accent-subtle: var(--neutral-800);
+  --shadow-1: 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 1px 3px 0 rgb(0 0 0 / 0.5);
+  --shadow-2: 0 2px 4px -1px rgb(0 0 0 / 0.5), 0 4px 8px -2px rgb(0 0 0 / 0.6);
+  --shadow-3: 0 8px 16px -4px rgb(0 0 0 / 0.6), 0 16px 32px -8px rgb(0 0 0 / 0.7);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* A focus style defined once, here, so no component has to remember it and none can omit it.
+ * :focus-visible rather than :focus keeps it off mouse clicks and on keyboard navigation. */
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Reading content is bounded. Data tables are the documented exception and opt out explicitly. */
+.prose, .measure { max-width: var(--measure); }

@@ -1,0 +1,24 @@
+{
+  "name": "dapr",
+  "description": "Dapr — a component manifest, or the SDK declared as a package reference.",
+  "requires": [],
+  "triggers": [
+    {
+      "glob": "**/*.yaml",
+      "contains": "dapr.io/v1alpha1",
+      "fact": "a Dapr component manifest"
+    },
+    {
+      "glob": "**/*.yml",
+      "contains": "dapr.io/v1alpha1",
+      "fact": "a Dapr component manifest"
+    },
+    {
+      "glob": "**/*.csproj",
+      "contains": "Dapr.",
+      "fact": "a Dapr SDK package reference"
+    }
+  ],
+  "facts": [],
+  "commands": []
+}

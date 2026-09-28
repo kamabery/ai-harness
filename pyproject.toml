@@ -1,0 +1,24 @@
+[project]
+name = "ai-harness"
+version = "0.1.0"
+description = "A build harness whose state is queryable and whose checks prove themselves."
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+harness = "harness.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[build-system]
+requires = ["uv_build>=0.9,<0.10"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "harness"
+module-root = "src"
+data = { }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

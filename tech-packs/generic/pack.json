@@ -1,0 +1,13 @@
+{
+  "name": "generic",
+  "description": "Always applies.",
+  "requires": [],
+  "always": true,
+  "triggers": [],
+  "facts": [],
+  "commands": [
+    "build",
+    "test",
+    "run"
+  ]
+}

@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+
+# Raw tool output. Captured in full so a 1-of-N failure stays nameable, kept out of git
+# because it is the dominant cost, and NEVER citable as evidence — docs/STANDARDS.md.
+.harness/raw/

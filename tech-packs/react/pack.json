@@ -1,0 +1,17 @@
+{
+  "name": "react",
+  "description": "React — the other of the two UI choices this organisation makes.",
+  "requires": [],
+  "triggers": [
+    {
+      "glob": "**/package.json",
+      "contains": "\"react\"",
+      "fact": "React declared as a dependency"
+    }
+  ],
+  "facts": [],
+  "commands": [
+    "npm run build",
+    "npm test"
+  ]
+}

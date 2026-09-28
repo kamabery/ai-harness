@@ -1,0 +1,25 @@
+{
+  "name": "blazor",
+  "description": "Blazor — one of the two UI choices this organisation makes.",
+  "requires": [
+    "dotnet"
+  ],
+  "triggers": [
+    {
+      "glob": "**/*.razor",
+      "fact": "a Razor component"
+    },
+    {
+      "glob": "**/*.csproj",
+      "contains": "Microsoft.NET.Sdk.BlazorWebAssembly",
+      "fact": "a Blazor WebAssembly project"
+    },
+    {
+      "glob": "**/*.csproj",
+      "contains": "Microsoft.AspNetCore.Components",
+      "fact": "the Blazor component library"
+    }
+  ],
+  "facts": [],
+  "commands": []
+}

@@ -1,0 +1,28 @@
+{
+  "name": "dotnet",
+  "description": ".NET. This organisation builds on .NET 10 and nothing earlier.",
+  "requires": [],
+  "triggers": [
+    {
+      "glob": "**/*.sln",
+      "fact": "a .NET solution"
+    },
+    {
+      "glob": "**/*.csproj",
+      "fact": "a .NET project"
+    }
+  ],
+  "facts": [
+    {
+      "name": "target framework",
+      "glob": "**/*.csproj",
+      "capture": "<TargetFramework>([^<]+)</TargetFramework>",
+      "expect": "net10.0",
+      "fact": "the framework this project targets. net10.0 is the only accepted value"
+    }
+  ],
+  "commands": [
+    "dotnet build",
+    "dotnet test"
+  ]
+}
