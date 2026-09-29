@@ -13,6 +13,19 @@ The only phases that produce product code. Everything else exists to make these 
 4. Run the check. Then run every earlier phase's check, unmodified.
 5. Record executed and skipped counts, and compare them to phase 1's numbers.
 
+## If this slice changes anything a person sees
+
+Set `needs_human` on the phase, and close it on a person having looked - not on the render sweep
+going green. The sweep asserts six absences (overflow, colour==background, unpainted svg, unnamed
+control, console errors, axe violations); a screen can satisfy all six and still be cramped,
+confusing, or missing what the user came for. Put `SPEC.md`'s *What it must feel like to use* in
+front of them, and record what they saw:
+
+```
+APPROVED-BY: <name> <date>
+SAW: <which screens, which viewports, which themes>
+```
+
 ## Red
 
 Free if the check is written first. Where it is not free, manufacture it deliberately and put it

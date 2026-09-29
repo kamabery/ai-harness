@@ -26,6 +26,7 @@ Two corollaries, each from a recorded failure:
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -641,3 +642,86 @@ def report(results: list) -> tuple:
     lines.append("harness check: " + ("PASS" if defects == 0 else "FAIL") + " - "
                  + str(defects) + " defect(s) over " + str(len(results)) + " check(s)")
     return "\n".join(lines), defects
+
+
+# -- approved ------------------------------------------------------------------------------------
+
+APPROVAL_RE = re.compile(r"(?m)^\s*APPROVED-BY:\s*(?P<who>[^\n]{3,})$")
+SAW_RE = re.compile(r"(?m)^\s*SAW:\s*(?P<what>[^\n]{10,})$")
+
+
+def _selftest_approved() -> str | None:
+    """A phase that changes a screen and shows no sign-off must be refused."""
+    bad = state_mod.State(run="selftest")
+    bad.phases = [state_mod.Phase(1, "ui", "cmd", status="passed", red_seen=True,
+                                  capture_sha="x", needs_human=True)]
+    if not state_mod.validate(bad):
+        return "a screen-changing phase closed with no sign-off and was accepted"
+    # And a sign-off that cannot name what was looked at is one where nothing was.
+    if _approval_defects("APPROVED-BY: Someone 2026-01-01\n", 1):
+        pass
+    else:
+        return "an approval with no SAW: line was accepted"
+    return None
+
+
+def _approval_defects(text: str, phase: int) -> list:
+    defects = []
+    approval = APPROVAL_RE.search(text)
+    saw = SAW_RE.search(text)
+    if approval is None:
+        defects.append(
+            "phase " + str(phase) + " carries no `APPROVED-BY: <name> <date>` line")
+    if saw is None:
+        defects.append(
+            "phase " + str(phase) + " carries no `SAW:` line naming which screens, which "
+            "viewports and which themes were looked at - a sign-off that cannot say what was "
+            "looked at is one where nothing was")
+    return defects
+
+
+@register("approved", "a person looked at what a person will see", _selftest_approved)
+def check_approved(target: Path, run_dir: Path) -> Result:
+    """The one signal here whose content is a judgement rather than an exit code.
+
+    Every automated screen assertion available is an ABSENCE: no horizontal overflow, no computed
+    text colour equal to its background, no unpainted svg, no interactive control without a name,
+    zero console errors, zero serious axe violations. A real run's visual criterion was exactly
+    those six, printed per screen. All six go green on a screen that is cramped, badly ordered,
+    confusing, or missing the thing the user came for - none of that emits a console error.
+
+    Asking a check harder does not help: it produces an invented answer in a confident tone. So
+    the judgement stays a person's, and this stays a command - it exits non-zero until that
+    judgement is written down, dated and attributed, in the phase's own capture:
+
+        APPROVED-BY: Kurt Mabery 2026-09-29
+        SAW: /dashboard, /work-items, /radar - 1280x800 and 390x844, light and dark
+
+    An agent could type both lines. That is worth saying plainly rather than implying a guarantee
+    this cannot give. What the format buys is that forging it is a lie - attributed, dated, about
+    named screens - rather than the silent omission an unwritten judgement is.
+    """
+    result = Result(name="approved")
+    try:
+        state = state_mod.load(target)
+    except FileNotFoundError as exc:
+        result.defects.append(str(exc))
+        return result
+
+    visual = [p for p in state.phases if p.needs_human]
+    if not visual:
+        return result
+    for phase in visual:
+        result.examined += 1
+        if phase.status != "passed":
+            continue
+        if not phase.capture_ref:
+            result.defects.append("phase " + str(phase.id) + " needs a sign-off and has no capture")
+            continue
+        path = run_dir / phase.capture_ref
+        if not path.is_file():
+            result.defects.append("phase " + str(phase.id) + " capture is missing")
+            continue
+        text = path.read_text(encoding="utf-8", errors="replace")
+        result.defects.extend(_approval_defects(text, phase.id))
+    return result

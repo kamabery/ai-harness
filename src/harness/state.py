@@ -99,6 +99,14 @@ class Phase:
     #: whose sha moves with no phase row is the 30-of-38-overwritten-PNGs failure.
     capture_sha: str | None = None
     red_seen: bool = False
+    #: Does closing this phase require a person to have looked at the result?
+    #: True for any phase that changes something a human sees. Six absence assertions - no
+    #: overflow, no colour==background, no unpainted svg, no unnamed control, zero console
+    #: errors, zero axe violations - all go green on a screen that is ugly, cramped, confusing
+    #: or missing what the user expected. None of those emits a console error.
+    needs_human: bool = False
+    #: What the person said they looked at. Set by the `approved` check reading the capture.
+    human_saw: str = ""
     counts: Counts = field(default_factory=Counts)
 
     def as_json(self) -> dict:
@@ -111,6 +119,8 @@ class Phase:
             "capture_ref": self.capture_ref,
             "capture_sha": self.capture_sha,
             "red_seen": self.red_seen,
+            "needs_human": self.needs_human,
+            "human_saw": self.human_saw,
             "counts": self.counts.as_json(),
         }
 
@@ -337,6 +347,11 @@ def validate(state: State) -> list:
                 "watched go red is the same document as a check that cannot fail")
         if phase.status == "passed" and not phase.capture_sha:
             defects.append("phase " + str(phase.id) + " is passed with no capture_sha")
+        if phase.status == "passed" and phase.needs_human and not phase.human_saw:
+            defects.append(
+                "phase " + str(phase.id) + " changes something a person sees and closed with no "
+                "sign-off - every automated screen check asserts an ABSENCE, and a screen with "
+                "nothing wrong with it is not the same as a screen that is any good")
         for need in phase.needs:
             if state.fact(need) is None:
                 defects.append("phase " + str(phase.id) + " needs " + need

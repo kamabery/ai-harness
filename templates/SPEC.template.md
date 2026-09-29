@@ -44,6 +44,31 @@
      signal for a behaviour the spec spells out; a reviewer handed only the captures cannot tell
      that apart from an unproven claim. -->
 
+## What it must feel like to use
+
+{{THE_EXPERIENCE}}
+
+<!-- ONLY IF A PERSON EVER SEES THIS SYSTEM. Write it in their words, and do not sharpen it.
+
+     This section exists because the rule above - a criterion must name something that prints -
+     was quietly deleting requirements rather than surfacing them. "The board should be easy to
+     scan", "editing shouldn't feel like a form", "I want to see what changed" never print, so
+     they were moved out of "done means" and then out of the run entirely. The product met every
+     criterion it kept and manual testing still found poor UX, because every automated screen
+     check is an ABSENCE assertion - no overflow, no colour==background, no unnamed control, zero
+     console errors, zero axe violations - and all six go green on a screen that is cramped,
+     badly ordered, or missing what the user came for.
+
+     So these do not become phase tests and they are not deleted. They become the thing a person
+     is asked to look for at the sign-off, and the phase that touches a screen is marked
+     `needs_human`. `harness check --checks approved` then refuses to close it without:
+
+         APPROVED-BY: <name> <date>
+         SAW: <which screens, which viewports, which themes>
+
+     An unobservable requirement that is written down is a question for a person. One that was
+     filtered out is a defect nobody is looking for. -->
+
 ## What it must respect
 
 {{CONSTRAINTS}}

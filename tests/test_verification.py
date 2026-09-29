@@ -11,6 +11,7 @@ green this whole harness exists to refuse.
 
 from __future__ import annotations
 
+import pathlib
 from pathlib import Path
 
 import pytest
@@ -311,3 +312,53 @@ def test_the_report_survives_content_it_did_not_choose():
     outcome = api.Outcome(code=0, report="inherited: a → b — done")
     assert "→" in str(outcome)
     assert outcome.rows() == []
+
+
+# -- 7. the gap manual testing found ---------------------------------------------------------------
+
+
+def test_a_screen_changing_phase_cannot_close_without_a_person(tmp_path):
+    """Manual testing of the predecessor's output found defects and poor UX its runs did not.
+
+    Both completed runs scored ABSENT on "a person looked at this". Every automated screen check
+    available is an absence assertion, and a screen with nothing detectably wrong with it is not
+    the same as a screen that is any good.
+    """
+    bad = state.State(run="r")
+    bad.phases = [state.Phase(1, "dashboard", "render sweep", status="passed", red_seen=True,
+                              capture_sha="x", needs_human=True)]
+    defects = state.validate(bad)
+    assert any("sign-off" in d for d in defects), defects
+
+    bad.phases[0].human_saw = "/dashboard - 1280x800 and 390x844, light and dark"
+    assert not any("sign-off" in d for d in state.validate(bad))
+
+
+def test_a_sign_off_that_cannot_name_what_was_looked_at_is_refused():
+    """A sign-off with no SAW: line is a rubber stamp."""
+    assert check._approval_defects("APPROVED-BY: A Person 2026-09-29\n", 1)
+    assert check._approval_defects("SAW: /dashboard at two viewports\n", 1)
+    assert not check._approval_defects(
+        "APPROVED-BY: A Person 2026-09-29\nSAW: /dashboard - 1280x800, light and dark\n", 1)
+
+
+def test_the_scorecard_reports_when_nothing_can_notice_bad_ux(tmp_path):
+    """A run with no screen-changing phase must say so, not score well by omission."""
+    from harness import score
+    st = state.State(run="r")
+    st.phases = [state.Phase(1, "api", "dotnet test", status="passed", red_seen=True,
+                             capture_sha="x", counts=state.Counts(executed=9))]
+    state.save(tmp_path, st)
+    report, _ = score.scorecard(tmp_path)
+    assert "human-saw-it" in report
+    assert "ABSENT" in report
+    assert "nothing in this harness can notice bad UX" in report
+
+
+def test_the_spec_template_keeps_unobservable_requirements_instead_of_deleting_them():
+    """The rule "a criterion must name something that prints" was filtering UX out of specs."""
+    spec = pathlib.Path(__file__).resolve().parents[1] / "templates" / "SPEC.template.md"
+    text = spec.read_text(encoding="utf-8")
+    assert "What it must feel like to use" in text
+    assert "needs_human" in text
+    assert "ABSENCE assertion" in text

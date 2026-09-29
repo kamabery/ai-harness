@@ -117,6 +117,29 @@ def _memory(target: Path, state: state_mod.State) -> Dimension:
                      [] if used else ["this run inherited nothing - run `harness inherit`"])
 
 
+def _human_saw_it(state: state_mod.State) -> Dimension:
+    """Did a person look at what a person will see?
+
+    The predecessor scored ABSENT here on both completed runs - no phase in either workspace
+    closed on someone having looked - and its screens shipped with defects and poor UX that
+    manual testing later found. Every automated screen check it ran was an absence assertion,
+    and a screen with nothing detectably wrong with it is not the same as a screen that is good.
+    """
+    visual = [p for p in state.phases if p.needs_human]
+    if not visual:
+        return Dimension("human-saw-it", ABSENT,
+                         "no phase is marked as changing something a person sees",
+                         ["if this run touches a screen, set needs_human on that phase - "
+                          "otherwise nothing in this harness can notice bad UX"])
+    signed = [p for p in visual if p.human_saw]
+    verdict = OK if len(signed) == len(visual) else WEAK
+    return Dimension("human-saw-it", verdict,
+                     str(len(signed)) + " of " + str(len(visual))
+                     + " screen-changing phase(s) carry a dated, attributed sign-off",
+                     [str(p.id) + " " + p.name + ": nobody has said what they looked at"
+                      for p in visual if not p.human_saw])
+
+
 def _selftests() -> Dimension:
     result = check_mod.check_selftest(Path("."), Path("."))
     proven = result.examined - len(result.defects)
@@ -134,6 +157,7 @@ NOT_MEASURED = (
     "whether the architecture is the right architecture, only whether a rule has a check",
     "whether a capture was pasted or typed",
     "whether a human sign-off reflects a human having actually looked",
+    "whether a screen is GOOD - only that six things are absent from it",
 )
 
 
@@ -145,7 +169,8 @@ def scorecard(target: Path) -> tuple:
         state = state_mod.State(run="(none)")
 
     dimensions = [_evidence(state), _counts(state), _facts(state),
-                  _architecture(target), _memory(target, state), _selftests()]
+                  _architecture(target), _human_saw_it(state), _memory(target, state),
+                  _selftests()]
     width = max(len(d.name) for d in dimensions)
     lines = ["harness scorecard - " + str(target), ""]
     for dimension in dimensions:
