@@ -175,6 +175,20 @@ def triggered_packs(root: Path, packs: dict[str, TechPack]) -> dict[str, str]:
     return found
 
 
+
+def _contradicts(rule, found: str) -> bool:
+    """Does a captured value contradict what this organisation settled on?
+
+    `expect_each` decides when present: every item of a multi-valued capture must match it, which
+    is how `net10.0-android;net10.0-ios` stays a fact rather than becoming a conflict while
+    `net9.0-android` still becomes one. Without it, exact equality against `expect`.
+    """
+    if rule.expect_each:
+        items = [i.strip() for i in found.split(";") if i.strip()]
+        return not items or any(re.match(rule.expect_each, i) is None for i in items)
+    return rule.expect is not None and found != rule.expect
+
+
 def collect_facts(
     root: Path, packs: dict[str, TechPack], active: dict[str, str]
 ) -> tuple[list[Fact], list[Conflict]]:
@@ -238,7 +252,7 @@ def collect_facts(
                     evidence = _rel(path, root, line)
                     # A value that contradicts a commitment already made is a finding, not a fact
                     # with a worse status: no Phase 0 row settles it by running anything.
-                    if rule.expect is not None and found != rule.expect:
+                    if _contradicts(rule, found):
                         conflicts.append(
                             Conflict(name=rule.name, found=found, expected=rule.expect,
                                      evidence=evidence)

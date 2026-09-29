@@ -56,6 +56,13 @@ class FactRule:
     #: The only value this organisation accepts. A captured value that is not this one is reported
     #: as a **conflict** rather than recorded as a fact — see detect.Detection.conflicts.
     expect: str | None = None
+    #: A regex every item of a multi-valued capture must match, where exact equality
+    #: would be wrong. A .NET MAUI head declares `net10.0-android;net10.0-ios`: each
+    #: item is .NET 10 and none equals "net10.0", so exact comparison reports a
+    #: conflict that is not one. Noise sent to a developer is worse than no finding at
+    #: all, so the pack says how to compare rather than the detector guessing. Items
+    #: are split on `;`. When set this decides; `expect` stays the readable statement.
+    expect_each: str | None = None
 
     @classmethod
     def from_json(cls, data: dict) -> "FactRule":
@@ -67,6 +74,7 @@ class FactRule:
             value=data.get("value"),
             contains=data.get("contains"),
             expect=data.get("expect"),
+            expect_each=data.get("expect_each"),
         )
 
     @property

@@ -8,6 +8,10 @@
       "fact": "a .NET solution"
     },
     {
+      "glob": "**/*.slnx",
+      "fact": "a .NET solution (XML format). The generator emits this one, and `**/*.sln` does not match it"
+    },
+    {
       "glob": "**/*.csproj",
       "fact": "a .NET project"
     }
@@ -16,8 +20,9 @@
     {
       "name": "target framework",
       "glob": "**/*.csproj",
-      "capture": "<TargetFramework>([^<]+)</TargetFramework>",
+      "capture": "<TargetFrameworks?>([^<]+)</TargetFrameworks?>",
       "expect": "net10.0",
+      "expect_each": "^net10[.]0(-[a-z0-9.]+)?$",
       "fact": "the framework this project targets. net10.0 is the only accepted value"
     }
   ],
